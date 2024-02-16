@@ -4,27 +4,32 @@ Dt=r*Dx*Dx/k;
 Nt=round(1/Dt);
 x=0:Dx:1;
 u=zeros(Nt+1,Nx+1);
+u2=zeros(Nt+1,Nx+1);
 u(1,:)=x.*(1-x);
-a=0;
 for j=2:Nt+1
-    b=zeros(Nx+1,1);
-    b(1)=r*u(j-1,2)+(1-r)*u(j,1)-2*r*Dx+Dt*cos(0);
-    b(Nx+1)=u(j-1,Nx+1)+(1-r)*u(j,Nx)+2*r*Dx+Dt*cos((Nx+1)*Dx);
+    d=zeros(Nx+1,1);
+    d(1)=r*u(j-1,2)+(1-r)*u(j,1)-2*r*Dx+Dt*cos(0);
+    d(Nx+1)=u(j-1,Nx+1)+(1-r)*u(j,Nx)+2*r*Dx+Dt*cos((Nx+1)*Dx);
     for i=2:Nx
-        b(i-1)=r*u(j-1,i+1)+(1-2*r)*u(j-1,i)+r*u(j-1,i-1)+Dt*cos((i-1)*Dx)-2*r*Dx;
+        d(i-1)=r*u(j-1,i+1)+(1-2*r)*u(j-1,i)+r*u(j-1,i-1)+Dt*cos((i-1)*Dx)-2*r*Dx;
     end
     A=diag(ones(Nx+1,1)*(1+2*r))+diag(ones(Nx,1)*(-r),-1)+diag(ones(Nx,1)*(-r),1);
     A(1,1)=1+r;
     A(1,2)=-r;
     A(Nx+1,Nx+1)=1+r;
     A(Nx+1,Nx)=-r;
-    u(j,1:Nx+1)=tridiagonal_solve(A,b);
+    u(j,1:Nx+1)=tridiagonal_solve(A,d);
+    b=ones(Nx+1,1)*(1+2*r);
+    a=ones(Nx+1,1)*(r);
+    c=ones(Nx+1,1)*(r);
+    b(1)=1+r;
+    b(Nx+1)=1+r;
+    c(Nx+1)=0;
+    a(1)=0;
+    u2(j,1:Nx+1)=thomas_algorithm(a,b,c,d);
 end
 
-plot(x,u(Nt+1,:));
-
-
-
+disp(norm(u-u2,2));
 function vals=tridiagonal_solve(A,b)
     Aug=[A,b];
     N=length(A);
@@ -56,8 +61,6 @@ function val=thomas_algorithm(a,b,c,d)
     for j=2:N
        s(j)=d(j)+a(j)*s(j-1)/alpha(j-1);
     end
-    disp(alpha);
-    disp(s);
     val(N)=s(N)/alpha(N);
     for j=N-1:-1:1
        val(j)=(s(j)+c(j)*val(j+1))/alpha(j); 
