@@ -1,4 +1,4 @@
-k=0.25;Dx=0.1;r=1/2;
+k=0.25;Dx=0.1;r=0.5;
 Nx=round(1/Dx);
 Dt=r*Dx*Dx/k;
 Nt=round(1/Dt);
@@ -7,10 +7,10 @@ u2=zeros(Nt+1,Nx+1);
 u2(1,:)=100*x.*(1-x);
 for j=2:Nt+1
     d=zeros(Nx+1,1);
-    d(1)=r*u2(j-1,2)+(1-r)*u2(j,1);
-    d(Nx+1)=u2(j-1,Nx+1)+(1-r)*u2(j,Nx);
+    d(1)=r*u2(j-1,2)+(1-r)*u2(j-1,1);
+    d(Nx+1)=r*u2(j-1,Nx)+(1-r)*u2(j-1,Nx+1);
     for i=2:Nx
-        d(i-1)=r*u2(j-1,i+1)+(1-2*r)*u2(j-1,i)+r*u2(j-1,i-1);
+        d(i)=r*u2(j-1,i+1)+(1-2*r)*u2(j-1,i)+r*u2(j-1,i-1);
     end
     b=ones(Nx+1,1)*(1+2*r);
     a=ones(Nx+1,1)*(r);
@@ -22,17 +22,18 @@ for j=2:Nt+1
     u2(j,1:Nx+1)=thomas_algorithm(a,b,c,d);
 end
 
+
 % plot(x,u2(Nt+1,:));
 u_exact=zeros(Nt+1,Nx+1);
 
 for i=1:Nx+1
     for j=1:Nt+1
-        n=1:5;
+        n=1:50;
         s=0;
         for k=n
             s=s+((1+(-1)^k)/(k*k))*exp(-k*k*pi*pi*(j-1)*Dt*0.25)*cos(k*pi*(i-1)*Dx);
         end
-        u_exact(j,i)= 50/3 -(200/pi*pi)*s;
+        u_exact(j,i)= (50/3) - (200/(pi*pi))*s;
     end
 end
 
