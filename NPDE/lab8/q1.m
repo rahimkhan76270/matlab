@@ -15,8 +15,7 @@ u(1,:)=T_bottom;
 u(:,1)=T_left;
 u(:,Nx+1)=T_right;
 sz=Nx*Ny;
-A=diag(ones(sz,1)*(-2-2*beta*beta))+diag(ones(Nx*Ny-1,1)*(beta*beta),1)+diag(ones(Nx*Ny-1,1)*beta,-1);%+diag(ones(Nx*Ny-2*Ny-4),Nx+1)+diag(ones(Nx*Ny-2*Ny-4),-Nx-1);
-
+A=diag(ones(sz,1)*(-2-2*beta*beta))+diag(ones(Nx*Ny-1,1)*(beta*beta),1)+diag(ones(Nx*Ny-1,1)*beta,-1)+diag(ones(Nx*Ny-Ny-1,1),Ny+1)+diag(ones(Nx*Ny-Ny-1,1),-Ny-1);
 for i=1:Ny-1
    A(i*Nx,i*Nx+1)=0;
    A(i*Nx+1,i*Nx)=0;
@@ -25,7 +24,11 @@ b=zeros(Nx*Ny,1);
 for i=1:Ny
    b(i*Nx)=-beta*beta*T_top; 
 end
-
+sol=A\b;
+for i=2:Nx
+   u(2:Ny,i)=sol(i*Ny:);
+end
+disp(norm(u-actual_value(h,w,Dx,Dy),2));
 
 function vals=actual_value(h,w,Dx,Dy)
     Nx=round(w/Dx);
