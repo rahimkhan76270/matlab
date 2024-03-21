@@ -14,9 +14,9 @@ u(1,:)=2*x;
 for i=2:Nt
     for j=2:Nx
         if mod(i,2)==0
-            u(i+1,j)=u(i,j)-C*(u(i,j+1)-u(i,j));
+            u(i,j)=u(i-1,j)-C*(u(i-1,j+1)-u(i-1,j));
         else
-             u(i+1,j)=u(i,j)-0.5*(0.5*(u(i,j+1)-u(i,j-1))+0.5*C*(u(i,j+1)-u(i,j-1)));
+             u(i,j)=u(i-1,j)-0.5*(0.5*(u(i-1,j+1)-u(i-1,j-1))+0.5*C*(u(i-1,j+1)-u(i-1,j-1)));
         end 
     end
 end
